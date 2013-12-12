@@ -1,4 +1,7 @@
+
 //import java.util.Comparator;
+import java.io.File;
+
 
 public class Song /*implements Comparable<Song>*/{
     
@@ -15,6 +18,20 @@ public class Song /*implements Comparable<Song>*/{
         this.composer = composer;
         this.singer = singer;
         this.filePath = filePath;
+    }
+    
+    public static boolean isValidName(String name) {
+        if(name == null) {
+            return false;
+        } else if(name.length() < 1) {
+            return false;
+        } 
+        return true;
+    }
+    
+    public static boolean isValidFilePath(String filePath) {
+        File f = new File(filePath);
+        return f.exists();  
     }
     
     public String getName() {

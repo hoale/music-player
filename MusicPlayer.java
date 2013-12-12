@@ -11,11 +11,11 @@ public class MusicPlayer {
     private Scanner sc = new Scanner(System.in);
     private SoundPlayer soundPlayer = new SoundPlayer();
     private Song currentSong;
-    private PlayList playList;
+    private static PlayList playList = new PlayList();
     private String status = "stop";
+    private List<Song> songList = playList.getSongList();
     
     public static void main(String[] args) {
-        //List<Song> songs = new LinkedList<Song>();
         
         Song song1 = createNewSong("Anh Muon Em Song Sao","Chi Dan", "Bao Anh", "songs/Anh Muon Em Song Sao - Bao Anh.mp3");
         Song song2 = createNewSong("Grenade", "Bruno Mars", "Bruno Mars", "songs/Grenade.mp3"); 
@@ -23,23 +23,7 @@ public class MusicPlayer {
         Song song4 = createNewSong("Just Give Me A Reason", "Unknown", "Pink,Nate Ruess", "songs/Just Give Me A Reason.mp3");       
         Song song5 = createNewSong("Loi Noi Doi Chan That", "Justatee ft. Kimmese", "Justatee ft. Kimmese", "songs/Loi Noi Doi Chan That.mp3");
         Song song6 = createNewSong("Love The Way You Lie","Skylar Grey", "Skylar Grey Ft. Eminem", "songs/Love The Way You Lie - Skylar Grey Ft. Eminem.mp3");
-        
-       /*
-        songs.add(new Song("Anh Muon Em Song Sao","Chi Dan", "Bao Anh", "songs/Anh Muon Em Song Sao - Bao Anh.mp3"));
-        songs.add(new Song("Grenade", "Bruno Mars", "Bruno Mars", "songs/Grenade.mp3")); 
-        songs.add(new Song("It Will Rain", "Bruno Mars", "Bruno Mars", "songs/It Will Rain - Bruno Mars.mp3"));
-        songs.add(new Song("Just Give Me A Reason", "Unknown", "Pink,Nate Ruess", "songs/Just Give Me A Reason.mp3"));       
-        songs.add(new Song("Loi Noi Doi Chan That", "Justatee ft. Kimmese", "Justatee ft. Kimmese", "songs/Loi Noi Doi Chan That.mp3"));
-        songs.add(new Song("Love The Way You Lie","Skylar Grey", "Skylar Grey Ft. Eminem", "songs/Love The Way You Lie - Skylar Grey Ft. Eminem.mp3"));
-        
-        java.util.Collections.sort(songs);
-        
-        for (Song p : songs) {
-            System.out.println(p);
-        }*/
-        
-        
-        PlayList playList = new PlayList();
+       
         playList.addSong(song1);
         playList.addSong(song2);
         playList.addSong(song3);
@@ -63,6 +47,7 @@ public class MusicPlayer {
         while (true) {
             List<Song> songList = playList.getSongList();
             String choice = showPlayList();
+            System.out.println("choice: " + choice);
             if (isInteger(choice)) {
                 int songNumber = Integer.parseInt(choice);
                 if (1 <= songNumber && songNumber <= songList.size()){
@@ -83,13 +68,18 @@ public class MusicPlayer {
                     case ".":
                         stop();
                         break;
-                        
+                    case "+":
+                        addSongToPlayList();
+                        break;
+                    case "e":
+                        editSong();
+                        break;
+                    case "-":
+                        //deleteSong();
+                        break;
                 }
             }
-            
-            
-            
-            
+
         }
     }
     
@@ -118,10 +108,12 @@ public class MusicPlayer {
     
     private String showPlayList() {
         System.out.println("---Commands---\n");
-        System.out.println("p - Play (Pause - Resume)\n");
-        System.out.println(". - Stop\n");
+        System.out.println("\tp - Play (Pause - Resume)\n");
+        System.out.println("\t. - Stop\n");
+        System.out.println("\t+ - Add a Song to Song List\n"); 
+        System.out.println("\te - Edit a Song in Song List\n");
+        System.out.println("\t- - Delete a Song from Song List\n");
         System.out.println("---Song List---\n");
-        List<Song> songList = playList.getSongList();
         
         Song indexSong;
         int songNumber;
@@ -141,6 +133,69 @@ public class MusicPlayer {
         
     }
     
+    private void addSongToPlayList() {
+        String songName = "";
+        while (!Song.isValidName(songName)) {
+            System.out.println("Enter the song's name: ");
+            songName = sc.nextLine();
+        }
+        
+        System.out.println("Enter the composer's name: ");
+        String composer = sc.nextLine();
+        
+        System.out.println("Enter the singer's name: ");
+        String singer = sc.nextLine();
+        
+        String filePath = "";
+        while(!Song.isValidFilePath(filePath)) {
+            System.out.println("Enter file's path: ");
+            filePath = sc.nextLine();
+        }
+        
+        System.out.println("Do you really want to add this song ?(Y/N): ");
+        String answer = sc.nextLine();
+        if(isYesAnswer(answer)) {
+            Song song = new Song(songName, composer, singer, filePath);
+            playList.addSong(song);
+        }
+          
+    }
+    
+    private void editSong() {
+        int choiceNum;
+        Song searchSong;
+        System.out.println("Enter song's number to edit: ");
+        choiceNum = sc.nextInt();
+        sc.nextLine();
+        if (choiceNum > 0 && choiceNum <= songList.size()) {
+            searchSong = songList.get(choiceNum - 1);
+            String songName = "";
+            do {  
+                System.out.println("Enter new song's name:  ");
+                songName = sc.nextLine();   
+            }while (!Song.isValidName(songName));
+        
+            System.out.println("Enter new composer's name: ");
+            String composer = sc.nextLine();
+            
+            System.out.println("Enter new singer's name: ");
+            String singer = sc.nextLine();
+        
+            System.out.println("Do you really want to edit this song ?(Y/N): ");
+            String answer = sc.nextLine();
+            if(isYesAnswer(answer)) {
+                searchSong.setName(songName);
+                searchSong.setComposer(composer);
+                searchSong.setSinger(singer);
+            }
+                
+        } else {
+            System.out.println("number's song is out of range!!!");
+        }
+    }
+    
+    
+    
     private String readString() {
         while (true) {
            return sc.nextLine();
@@ -157,6 +212,14 @@ public class MusicPlayer {
         return true;
     }
     
+    private boolean isYesAnswer(String answer) {
+        if(answer.equals("y") || answer.equals("Y")) {
+          return true;  
+        } else {
+          return false;
+        }
+    }
+    
     private static Song createNewSong(String name, String composer, String singer, String filePath) {
         Song song = new Song();
         song.setName(name);
@@ -165,6 +228,8 @@ public class MusicPlayer {
         song.setFilePath(filePath);
         return song;
     }
+   
+    
     
  
 }
