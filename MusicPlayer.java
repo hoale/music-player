@@ -45,9 +45,8 @@ public class MusicPlayer {
     
     private void start() {
         while (true) {
-            List<Song> songList = playList.getSongList();
+            //List<Song> songList = playList.getSongList();
             String choice = showPlayList();
-            System.out.println("choice: " + choice);
             if (isInteger(choice)) {
                 int songNumber = Integer.parseInt(choice);
                 if (1 <= songNumber && songNumber <= songList.size()){
@@ -56,6 +55,9 @@ public class MusicPlayer {
                 }
             } else {
                 switch (choice) {
+                    case "x":
+                        System.exit(0);
+                        break;
                     case "p":
                         if (status.equals("play")) {
                             pause();
@@ -75,7 +77,10 @@ public class MusicPlayer {
                         editSong();
                         break;
                     case "-":
-                        //deleteSong();
+                        deleteSong();
+                        break;
+                    case "s":
+                        searchSong();
                         break;
                 }
             }
@@ -107,13 +112,15 @@ public class MusicPlayer {
     }
     
     private String showPlayList() {
-        System.out.println("---Commands---\n");
-        System.out.println("\tp - Play (Pause - Resume)\n");
-        System.out.println("\t. - Stop\n");
-        System.out.println("\t+ - Add a Song to Song List\n"); 
-        System.out.println("\te - Edit a Song in Song List\n");
-        System.out.println("\t- - Delete a Song from Song List\n");
-        System.out.println("---Song List---\n");
+        System.out.println("---Commands---");
+        System.out.println("\tx - Exit");
+        System.out.println("\tp - Play (Pause - Resume)");
+        System.out.println("\t. - Stop");
+        System.out.println("\t+ - Add a Song to Song List"); 
+        System.out.println("\te - Edit a Song in Song List");
+        System.out.println("\t- - Delete a Song from Song List");
+        System.out.println("\ts - Search a Song from Song List");
+        System.out.println("---Song List---");
         
         Song indexSong;
         int songNumber;
@@ -180,21 +187,63 @@ public class MusicPlayer {
             
             System.out.println("Enter new singer's name: ");
             String singer = sc.nextLine();
+            
+            System.out.println("change song:\n + song's name: " + songName + "\n + composer: " + composer + "\n + singer: " + singer);
         
             System.out.println("Do you really want to edit this song ?(Y/N): ");
             String answer = sc.nextLine();
             if(isYesAnswer(answer)) {
-                searchSong.setName(songName);
-                searchSong.setComposer(composer);
-                searchSong.setSinger(singer);
+                    searchSong.setName(songName);
+                    searchSong.setComposer(composer);
+                    searchSong.setSinger(singer);
             }
                 
         } else {
-            System.out.println("number's song is out of range!!!");
+           
+            System.out.println("number's song is out of range!!!\n");
         }
     }
     
+    private void deleteSong() {
+        int choiceNum;
+        Song searchSong;
+        System.out.println("Enter song's number to delete: ");
+        choiceNum = sc.nextInt();
+        sc.nextLine();
+        if (choiceNum > 0 && choiceNum <= songList.size()) {
+            searchSong = songList.get(choiceNum - 1);
+            System.out.println("Your choice: " + searchSong.getName() + " - " + searchSong.getSinger());
+            
+            System.out.println("Do you really want to delete this song ?(Y/N): ");
+            String answer = sc.nextLine();
+            if(isYesAnswer(answer)) {
+                playList.deleteSong(searchSong);
+            }
+        }
+    }
     
+    private void searchSong() {
+        String songName;
+        Song searchSong;
+        System.out.println("Enter song's name  to search: ");
+        songName = sc.nextLine();
+        
+        boolean found = false;
+        int i = 0;
+        while (!found && i < songList.size()) {
+            if (songList.get(i).getName().equals(songName)) {
+                searchSong = songList.get(i);
+                System.out.println("Searching Song: " + (i+1) + " - " + searchSong.getName() + " - " + searchSong.getSinger());
+                found = true;
+            } else {
+                i++;
+            }
+        }
+        
+        if (!found) {
+            System.out.println("Can't not be found the Song");
+        }
+    }
     
     private String readString() {
         while (true) {

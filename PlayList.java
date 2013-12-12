@@ -10,6 +10,10 @@ public class PlayList {
         this.songList.add(song);
     }
     
+    public void deleteSong(Song song) {
+        this.songList.remove(song);
+    }
+    
     public List<Song> getSongList() {
         return this.songList;
     }
